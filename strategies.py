@@ -36,11 +36,11 @@ class PixStrategy(IPaymentStrategy):
 
 
 class CreditCardStategy(IPaymentStrategy):
-    def process_payment(self, amount: float) -> dict:
+    
         """
         A implementação (estratégia concreta) para pagamentos via Cartão.
         """   
-        def process_payment(self, amount: float) -> dict:
+        def process_payment(self, amount):
             print(f"Iniciando pagamento com Cartão de Crédito de R${amount:.2f}")
             # --- SIMULAÇÃO ---
             # Aqui entraria a lógica real de se conectar a um gateway

@@ -15,5 +15,4 @@ class PaymantStrategyFactory:
             return BoletoStrategy()
         
         #Se um método desconhecido for solicitado, lançamos um erro.
-        raise ValueError(f"Método de pagamento desconhecido: {method} não suportado.")
-     
+        raise ValueError(f"Método de pagamento desconhecido: {method} não suportado.") 
