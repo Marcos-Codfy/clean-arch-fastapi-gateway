@@ -15,6 +15,8 @@ class PIxStrategy(IpaymentStrategy):
             "transaction_id": f"pix_{order.id}_123"
         }
         
+        
+    
 class CreditCardStrategy(IpaymentStrategy):
     def process_payment(self,order: Order) -> Dict[str, any]:
         print(f"Processing Credit Card payment for Order{order.id} of amount R${order.amount:.2f}")
