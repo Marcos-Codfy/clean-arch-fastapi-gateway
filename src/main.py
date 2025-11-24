@@ -1,47 +1,60 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-from factory import PaymantStrategyFactory
-from context import PaymentContext
 
-#1. Crie a aplicação FastAPI
+# Importamos nossas novas peças da arquitetura limpa
+# o 'payment_use_case' é o cérebro e o 'repository' é a mémoria
+from src.core.payment_use_case import ProcessPaymentUseCase
+from src.adapters.repository import SqlAlchemyRepository, init_db
+
+# -- Configuração inicial (Injeção de depêndencia) --
+
+# 1. Inicializa o Banco de Dados (cria o arquivo .db se não existir)
+db_engine = init_db()
+
+# 2. Cria o repositório real (que sabe se comunicar com o SQL)
+repository = SqlAlchemyRepository(db_engine)
+
+# 3. Cria o  caso de uso e entrega o repositório para
+# Agora o 'payment_use_case' tem tudo que precisa para funcionar
+payment_use_case = ProcessPaymentUseCase(repository)
+
+# -- Configuração da API FastAPI --
 app = FastAPI(
-    title="API de Gateway de Pagamentos",
-    description="Um Projeto de POO com Padrões Strategy e Factory Method",
-    version="1.0.0"
+    title="Gateway de Pagamentos - FastAPI",
+    description="API com FastAPI, SQLAlchemy, Strategy Pattern e Factory Pattern",
+    version="2.0.0"
 )
 
-#2. Crie a instância da nossa Fábrica
-#(Pode ser global, pois não guarda estado)
-factory = PaymantStrategyFactory()
-
-#3. Defina o "Model (o que a API espera receber no corpo da requisição)"
+# Modelo de dados que chega da internet (JSON)
 class CheckoutRequest(BaseModel):
     amount: float
-    method: str  # "pix", "credit_card", "boleto"
-
-
-
-# 4.  Crie o COntroller (o endpoint da API)
+    method: str  # Ex: "pix", "boleto", "credit_card"
+    
 @app.post("/checkout")
 def perfom_checkout(request: CheckoutRequest):
     """
-    Recebe um pedido de checkout, seleciona a estratégia de
-    pagamento e executa a transação.
+    Endpoint principal
+    Recebe a requisição e passa a bola para o "payment_use_case"
     """
-    
     try:
-        #5. A API (Controller) pede à Fábrica a estratégia 
-        # <--- CORRIGIDO AQUI (era request.payment_method)
-        strategy = factory.get_strategy(request.method) 
-        
-        #6. A API (O Controller) cria o Contexto com a estratégia escolhida
-        context = PaymentContext(strategy)
-        
-        #7. A API (COntroler) manda o CONtexto executar
-        result = context.execute_payment(request.amount)
-        
-        return result
-    
+        #A API não sabe a lógica de pagamento, Ela só chama o Caso de uso
+        result = payment_use_case.execute(
+            amount=request.amount,
+            method=request.method
+        )
+        return {
+            "message": "Pagamento processado com sucesso!",
+            "payment_result": result
+        }
     except ValueError as e:
-        #Se a fábrica lançar um erro (Método não suportado)
+        # Erro de validação (ex: método de pagamento inválido)
         raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        # Erro génerico de servidor
+        print(f"❌ Erro interno: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/")
+def read_root():
+    return {"message": "Bem-vindo ao Gateway de Pagamentos com FastAPI!"}
+
