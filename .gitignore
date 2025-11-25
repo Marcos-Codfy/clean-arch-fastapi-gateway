@@ -1,11 +1,16 @@
 # Ambiente virtual do Python
 .venv/
+venv/
 
 # Cache e arquivos compilados do Python
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
+
+# Arquivos de dados locais que não devem ser versionados
+payments.db
+pagamentos.db
 
 # Pasta de configurações do VS Code (opcional, mas recomendado)
 .vscode/

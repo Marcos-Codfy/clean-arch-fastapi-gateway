@@ -4,38 +4,41 @@ from src.core.entities import Order, Payment
 
 class ProcessPaymentUseCase:
     """
-    Caso de Uso: O "cérebro" da operção
-    Ele coordena a Fábrica, a Estratégia e o Repositório
+    Caso de Uso: O "cérebro" da operação.
+    Ele coordena a Fábrica, a Estratégia e o Repositório.
+    Não tem dependência de FastAPI ou SQLAlchemy. É Lógica Pura!
     """
     def __init__(self, repository: IpaymentRepository):
+        # Injeção de Dependência: Eu recebo o Repositório (memória) como um contrato (Interface)
         self.repository = repository
-        #A fabrica pode ser instaciada aqui ou injetada via construtor
+        
+        # A Fábrica será usada para criar a estratégia correta
         self.factory = PaymentStrategyFactory()
     
     def execute(self, amount: float, method: str) -> dict:
         """
-        Executa o fluxo completo de pagamento
+        Executa o fluxo completo de pagamento.
         """
-        # 1. Cria a entidade Pedido (Order)
+        # 1. Crio a entidade Pedido (Order)
         order = Order(amount=amount)
         
-        # 2.Usa a Fábrica para descobrir qual estrátegia usar (Pix, Boleto, etc)
+        # 2. Uso a Fábrica para descobrir qual estratégia usar (Pix, Boleto, etc.)
+        # Se o método for inválido, a fábrica lança o ValueError que a API vai capturar
         strategy = self.factory.get_strategy(method)
         
-        # 3. Executa a estrategia (Polimorfismo: ocodigo não sabe qual é, só manda processar)
+        # 3. Executo a estratégia (Polimorfismo: o código aqui não sabe se é Pix ou Cartão, só manda processar)
         result = strategy.process_payment(order)
         
-        #4. Cria a entidade Pagamento como o resultado
+        # 4. Crio a entidade Pagamento com o resultado
         payment = Payment(
-         order_id=order.id,
+            order_id=order.id,
             method=method,
             status=result["status"],
             transaction_id=result.get("transaction_id")   
         )
         
-        # 5. Salva no banco de dados usando o repositorio
+        # 5. Salvo no banco de dados usando o Repositório (que pode ser o real ou o falso)
         self.repository.save(payment)
         
-        #Retorna o resultado para quem chamou (API)
+        # Retorno o resultado para quem chamou (a API)
         return result
-    

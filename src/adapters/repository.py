@@ -15,7 +15,7 @@ payment_table = Table(
     Column('order_id', String(50)),
     Column('method', String(50)),
     Column('status', String(20)),
-    Column('transaction_id', String(50), Nullable=True),
+    Column('transaction_id', String(50), nullable=True),
 )
 
 try:
