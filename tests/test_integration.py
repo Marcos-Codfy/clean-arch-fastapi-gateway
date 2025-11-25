@@ -9,7 +9,7 @@ from src.adapters.repository import init_db
 def client():
     """ Fixture que cria um cliente de teste para a API e garante um banco limpo. """
     
-    # 1. O PULO DO GATO 🐈:
+    # 1. Cleanup Inicial
     # Forçamos o SQLAlchemy a fechar as conexões abertas pelo import do main.py
     # Isso libera o arquivo no Windows para podermos deletar.
     db_engine.dispose()
@@ -21,7 +21,7 @@ def client():
             os.remove("payments.db")
         except PermissionError:
             # Se ainda der erro (raro), avisamos, mas tentamos seguir
-            print("⚠️ Aviso: Não foi possível deletar o DB. Teste pode estar sujo.")
+            print("Aviso: Não foi possível deletar o DB. Teste pode estar sujo.")
     
     # 3. Recria o banco do zero
     init_db() 
