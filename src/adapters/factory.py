@@ -3,8 +3,8 @@ from src.adapters.strategies import PixStrategy, CreditCardStrategy, BoletoStrat
 
 class PaymentStrategyFactory:
     """
-    Factory Method: Responsible for creating the correct strategy instance
-    based on a string (e.g., 'pix').
+    Método de fábrica: Responsável por criar a instância de estratégia correta
+    com base em uma string (por exemplo, 'pix').
     """
     
     @staticmethod
@@ -16,5 +16,5 @@ class PaymentStrategyFactory:
         elif method == 'boleto':
             return BoletoStrategy()
         
-        # Raises error if method does not exist
+        # Gera um erro se o método não existir.
         raise ValueError(f"Payment method '{method}' is not supported.")

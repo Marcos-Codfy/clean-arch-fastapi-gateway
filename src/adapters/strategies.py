@@ -4,10 +4,10 @@ from src.core.entities import Order
 
 class PixStrategy(IpaymentStrategy):
     def process_payment(self, order: Order) -> Dict[str, any]:
-        # Log simulated operation
+        # Operação simulada de registro
         print(f"Processing Pix payment for Order {order.id} - Amount R${order.amount:.2f}")
         
-        # Simulation of Bank API integration
+        #Simulação de integração de API bancária
         return {
             "status": "approved",
             "method": "pix",

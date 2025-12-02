@@ -7,7 +7,7 @@ from src.core.entities import Payment
 mapper_registry = registry()
 metadata = MetaData()
 
-# Tabela definida apenas com STring
+# Tabela definida apenas com String
 payment_table = Table(
  'pagamentos',
  metadata,
